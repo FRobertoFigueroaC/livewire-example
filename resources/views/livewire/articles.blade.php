@@ -3,6 +3,9 @@
 
     <h4>Search {{ $search }}</h4>
 
+    <a href="{{route('articles.create')}}">Create</a>
+    <br>
+
       {{-- wire:model their values will be synchronized with the server's properties when the "Save" button is pressed --}}
 
       {{-- wire:model.live -> To send property updates to the server as a user types into an input-field --}}
