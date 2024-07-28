@@ -27,7 +27,12 @@
     <ul>
       @foreach ($articles as $article)
         <li>
-          {{$article->title}}
+          <a href="{{route('articles.show', $article)}}">
+            {{$article->title}}
+          </a>
+          <a href="{{route('articles.edit', $article)}}">
+            -> Edit
+          </a>
         </li>
       @endforeach
     </ul>
