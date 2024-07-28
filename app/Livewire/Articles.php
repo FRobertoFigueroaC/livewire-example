@@ -8,14 +8,15 @@ use Livewire\Component;
 class Articles extends Component
 {
 
-    public $articles;
-
-    public function mount () {
-      $this->articles = Article::all();
-    }
+    public $search = "";
 
     public function render()
     {
-        return view('livewire.articles');
+        return view('livewire.articles', [
+          'articles' => Article::where(
+            'title', 'like', "%{$this->search}%"
+            )->get()
+        ]);
     }
+
 }
