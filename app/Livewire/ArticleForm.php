@@ -11,6 +11,18 @@ class ArticleForm extends Component
     public $title;
     public $content;
 
+    protected $rules = [
+      'title' => ['required', 'min:4'],
+      'content' => ['required']
+    ];
+
+    /* protected $messages = [
+      'title.required' => 'You need to add a :attribute'
+    ];
+    protected $validationAttributes = [
+      'title' => 'article title'
+    ]; */
+
     public function render()
     {
         return view('livewire.article-form');
@@ -18,17 +30,18 @@ class ArticleForm extends Component
 
     public function save() 
     {
-      $data = $this->validate([
-        'title' => ['required'],
-        'content' => ['required']
-      ]);
 
-      Article::create($data);
+      Article::create($this->validate());
 
       session()->flash('status',__('Article created.') );
 
       // $this->reset();
 
       $this->redirectRoute('articles.index');
+    }
+
+    public function updated($property)
+    {
+      $this->validateOnly($property);
     }
 }

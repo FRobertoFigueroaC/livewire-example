@@ -3,7 +3,7 @@
   <form wire:submit.prevent="save">
     <label for="title">
       Title:
-      <input wire:model="title"
+      <input wire:model.live.debounce.250ms="title"
             placeholder="Title"
             type="text"
             id="title">
@@ -16,7 +16,7 @@
     
     <label for="content">
       Content:
-      <textarea wire:model="content"
+      <textarea wire:model.live.debounce.250ms="content"
         id="content"
         placeholder="Content">
       </textarea>
