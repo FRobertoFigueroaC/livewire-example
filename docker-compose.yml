@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  livewire-postgres-db:
+    image: postgres:15.3
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=livewire
+      - POSTGRES_PASSWORD=123456
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
