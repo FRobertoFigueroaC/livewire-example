@@ -11,6 +11,17 @@
         <div>{{$message}}</div>
       @enderror
     </label>
+
+    <label for="slug">
+      Slug:
+      <input wire:model.live.debounce.250ms="article.slug"
+            placeholder="URL Friendly"
+            type="text"
+            id="slug">
+      @error('article.slug')
+        <div>{{$message}}</div>
+      @enderror
+    </label>
     
    
     
