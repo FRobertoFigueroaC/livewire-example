@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class ArticleFormTest extends TestCase
 {
-  use RefreshDatabase;
+    use RefreshDatabase;
     public $title = 'New title';
     public $content = 'New content';
     public $slug = 'new-title';
@@ -227,7 +227,7 @@ class ArticleFormTest extends TestCase
     public function blade_template_is_wired_properly()
     {
         Livewire::test('article-form')
-        ->assertSeeHtml('wire:submit.prevent="save"')
+        ->assertSeeHtml('submit="save"')
         ->assertSeeHtml('wire:model.live.debounce.250ms="article.title"')
         ->assertSeeHtml('wire:model.live.debounce.250ms="article.slug"')
         ->assertSeeHtml('wire:model.live.debounce.250ms="article.content"')

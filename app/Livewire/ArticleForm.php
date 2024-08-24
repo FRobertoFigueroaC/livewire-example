@@ -62,7 +62,8 @@ class ArticleForm extends Component
 
     public function render()
     {
-        return view('livewire.article-form');
+        return view('livewire.article-form')
+        ->layout('layouts.app');
     }
 
 }
