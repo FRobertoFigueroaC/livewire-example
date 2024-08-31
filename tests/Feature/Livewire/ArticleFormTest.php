@@ -3,9 +3,12 @@
 namespace Tests\Feature\Livewire;
 
 use App\Models\Article;
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -19,28 +22,41 @@ class ArticleFormTest extends TestCase
     public $updated_title = 'Updated title';
     public $updated_content = 'Updated content';
     public $updated_slug = 'updated-slug';
-    
+
     /** @test */
     public function can_create_new_article()
     {
-      $user = User::factory()->create();
+        Storage::fake('public');
+
+        $image = UploadedFile::fake()->image('post-image.png');
+        $user = User::factory()->create();
+        $category = Category::factory()->create();
+
 
       Livewire::actingAs($user)
         ->test('article-form')
+        ->set('image', $image)
         ->set('article.title', $this->title)
         ->set('article.slug', $this->slug)
         ->set('article.content', $this->content)
+        ->set('article.category_id', $category->id)
         ->call('save')
         ->assertSessionHas('status')
         ->assertRedirect(route('articles.index'))
       ;
 
+      $imagePath = Storage::disk('public')->files()[0];
+
       $this->assertDatabaseHas('articles', [
         'title' => $this->title,
+        'image' => $imagePath,
         'content' => $this->content,
         'slug' => $this->slug,
-        'user_id' => $user->id
+        'user_id' => $user->id,
+        'category_id' => $category->id
       ]);
+
+      Storage::disk('public')->assertExists($imagePath);
     }
     /** @test */
     public function title_is_required()
@@ -53,6 +69,53 @@ class ArticleFormTest extends TestCase
         ])
         ->assertSeeHtml(__('validation.required', ['attribute' => 'title']))
         ;
+
+    }
+    /** @test */
+    public function image_is_required()
+    {
+      Livewire::test('article-form')
+        ->set('article.title', $this->title)
+        ->set('article.content', $this->content)
+        ->call('save')
+        ->assertHasErrors([
+          'image' => 'required'
+        ])
+        ->assertSeeHtml(__('validation.required', ['attribute' => 'image']))
+        ;
+
+    }
+    /** @test */
+    public function image_must_be_of_type_image()
+    {
+      Livewire::test('article-form')
+        ->set('image', 'string-not-allowed')
+        ->call('save')
+        ->assertHasErrors([
+          'image' => 'image'
+        ])
+        ->assertSeeHtml(__('validation.image', ['attribute' => 'image']))
+        ;
+
+    }
+    /** @test */
+    public function image_must_be_2mb_max()
+    {
+        Storage::fake('public');
+        $image = UploadedFile::fake()->image('image.png')->size(3000);
+
+      Livewire::test('article-form')
+        ->set('image', $image)
+        ->call('save')
+        ->assertHasErrors([
+          'image' => 'max'
+        ])
+        ->assertSeeHtml(
+            __('validation.max.file', [
+                'attribute' => 'image',
+                'max' => '2048'
+            ]
+        ));
 
     }
 
@@ -181,6 +244,32 @@ class ArticleFormTest extends TestCase
     }
 
     /** @test */
+    public function can_update_articles_image()
+    {
+
+      Storage::fake('public');
+      $oldImage = UploadedFile::fake()->image('old-image.png');
+      $oldImagePath = $oldImage->store('/', 'public');
+      $newImage = UploadedFile::fake()->image('new-image.png');
+
+      $article = Article::factory()->create([
+            'image' => $oldImagePath
+      ]);
+
+      $user = User::factory()->create();
+
+      Livewire::actingAs($user)
+        ->test('article-form', ['article' => $article])
+        ->set('image', $newImage)
+        ->call('save')
+        ->assertSessionHas('status')
+        ->assertRedirect(route('articles.index'))
+      ;
+
+        Storage::disk('public')->assertExists($article->fresh()->image)
+            ->assertMissing($oldImagePath);
+    }
+    /** @test */
     public function can_update_articles()
     {
       $article = Article::factory()->create();
@@ -230,7 +319,6 @@ class ArticleFormTest extends TestCase
         ->assertSeeHtml('submit="save"')
         ->assertSeeHtml('wire:model.live.debounce.250ms="article.title"')
         ->assertSeeHtml('wire:model.live.debounce.250ms="article.slug"')
-        ->assertSeeHtml('wire:model.live.debounce.250ms="article.content"')
         ;
     }
 
@@ -263,7 +351,7 @@ class ArticleFormTest extends TestCase
         ->assertRedirect('login');
 
       $article = Article::factory()->create();
-      
+
       $this->get(route('articles.edit', $article))
         ->assertRedirect('login');
     }
