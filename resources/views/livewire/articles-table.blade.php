@@ -80,7 +80,7 @@
                                             </div>
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    <a href="{{ route('articles.show', $article) }}">
+                                                    <a href="{{route('articles.show', $article)}}">
                                                         {{ $article->title }}
                                                     </a>
                                                 </div>
@@ -92,7 +92,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex justify-between items-center">
-                                            <a href="{{ route('articles.edit', $article) }}"
+                                            <a href="{{route('articles.edit', $article)}}"
                                                 class="text-indigo-500 hover:text-indigo-900">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                                     xmlns="http://www.w3.org/2000/svg">
@@ -101,7 +101,7 @@
                                                     </path>
                                                 </svg>
                                             </a>
-                                            {{-- <livewire:article-delete-modal wire:key="{{'article-delete-button-'.$article->id}}"
+                                            <livewire:article-delete-modal wire:key="{{'article-delete-button-'.$article->id}}"
                                                 :article="$article">
                                                 <button
                                                     wire:click="$dispatch('confirmArticleDeletion', { article: {{ $article }} })"
@@ -113,7 +113,7 @@
                                                         </path>
                                                     </svg>
                                                 </button>
-                                            </livewire:article-delete-modal> --}}
+                                            </livewire:article-delete-modal>
                                         </div>
                                     </td>
                                 </tr>
@@ -128,19 +128,5 @@
             </div>
         </div>
         {{-- Table --}}
-
-
-        {{-- <ul>
-          @foreach ($articles as $article)
-            <li>
-              <a href="{{route('articles.show', $article)}}">
-                {{$article->title}}
-              </a>
-              <a href="{{route('articles.edit', $article)}}">
-                -> Edit
-              </a>
-            </li>
-          @endforeach
-        </ul> --}}
     </div>
 </div>
