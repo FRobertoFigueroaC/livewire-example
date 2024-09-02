@@ -5,14 +5,14 @@ namespace App\Livewire;
 use App\Models\Article;
 use Livewire\Component;
 
-class Articles extends Component
+class ArticlesTable extends Component
 {
 
     public $search = "";
 
     public function render()
     {
-        return view('livewire.articles', [
+        return view('livewire.articles-table', [
           'articles' => Article::where(
             'title', 'like', "%{$this->search}%"
             )->get()
