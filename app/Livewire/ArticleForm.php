@@ -20,7 +20,6 @@ class ArticleForm extends Component
     public $image;
 
     public $showCategoryModal = false;
-    public $showDeleteModal = false;
 
     protected function rules (){
       return [
@@ -129,12 +128,5 @@ class ArticleForm extends Component
         $this->closeCategoryForm();
     }
 
-    public function delete()
-    {
-        Storage::disk('public')->delete($this->article->image);
-        $this->article->delete();
-        $this->redirect(route('articles.index'));
-        session()->flash('status', __('Article deleted.'));
-    }
 
 }

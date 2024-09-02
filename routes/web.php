@@ -13,7 +13,9 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
-])->prefix('dashboard')->group(function(){
+])
+    ->prefix('dashboard')
+    ->group(function(){
 
     Route::view('/', 'dashboard')->name('dashboard');
 
