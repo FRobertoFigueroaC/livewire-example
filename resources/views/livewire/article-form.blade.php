@@ -72,6 +72,11 @@
           </div>
 
           <x-slot name="actions">
+            @if ($this->article->exists)
+                <x-danger-button class="mr-auto" wire:click="$set('showDeleteModal', true)">
+                    {{__('Delete')}}
+                </x-danger-button>
+            @endif
             <x-button>
               {{ __('Save') }}
             </x-button>
@@ -82,11 +87,29 @@
     </div>
   </div>
 
+  {{-- Confirmation Modal --}}
+  @if ($this->article->exists)
+    <x-confirmation-modal wire:model="showDeleteModal">
+        <x-slot name="title">Are you sure?</x-slot>
+        <x-slot name="content">
+            Do you want to delete the article: {{$this->article->title}}
+        </x-slot>
+        <x-slot name="footer">
+            <x-danger-button class="mr-auto" wire:click="delete">
+                {{__('Delete')}}
+            </x-danger-button>
+            <x-button wire:click="$set('showDeleteModal', false)">
+                {{__('Cancel')}}
+            </x-button>
+        </x-slot>
+    </x-confirmation-modal>
+    @endif
+  {{-- Confirmation Modal --}}
+
   {{-- Modal --}}
   <x-modal wire:model.live.debounce.250ms="showCategoryModal">
-    <form action="#">
+    <form wire:submit.prevent="saveCategory">
         <div class="px-6 py-4">
-            <pre>{{$category}}</pre>
             <div class="text-lg font-medium text-gray-900">
                 {{__('New Category')}}
             </div>
@@ -112,10 +135,11 @@
 
         </div>
 
-        <div class="flex flex-row justify-end px-6 py-4 bg-gray-100 text-end">
-           <x-secondary-button wire:click="closeCategoryForm">
+        <div class="flex flex-row justify-end px-6 py-4 bg-gray-100 text-end space-x-2">
+            <x-secondary-button wire:click="closeCategoryForm">
                 Close
             </x-secondary-button>
+            <x-button class="space-x-4">{{ __('Save') }}</x-button>
         </div>
     </form>
   </x-modal>

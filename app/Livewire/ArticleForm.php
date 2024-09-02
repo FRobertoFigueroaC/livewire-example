@@ -20,6 +20,7 @@ class ArticleForm extends Component
     public $image;
 
     public $showCategoryModal = false;
+    public $showDeleteModal = false;
 
     protected function rules (){
       return [
@@ -29,15 +30,15 @@ class ArticleForm extends Component
       ],
       'article.title' => ['required', 'min:4'],
       'article.content' => ['required'],
-      'article.category_id' => [],
+      'article.category_id' => ['required'],
       'article.slug' => [
         'required',
         'alpha_dash',
         Rule::unique('articles', 'slug')->ignore($this->article->id)
         // 'unique:articles,slug,' .$this->article->id
         ],
-        'category.name' => ['required'],
-        'category.slug' => ['required']
+        'category.name' => [],
+        'category.slug' => []
       ];
     }
 
@@ -98,8 +99,8 @@ class ArticleForm extends Component
 
     public function openCategoryForm()
     {
-        $this->category = new Category();
         $this->showCategoryModal = true;
+        $this->category = new Category();
     }
     public function updatedCategoryName($name)
     {
@@ -108,6 +109,32 @@ class ArticleForm extends Component
     public function closeCategoryForm()
     {
         $this->showCategoryModal = false;
+        $this->clearValidation('category.*');
+    }
+
+    public function saveCategory()
+    {
+        $this->validate([
+            'category.name' => [
+                Rule::requiredIf($this->category instanceof Category),
+                Rule::unique('categories', 'name'),
+            ],
+            'category.slug' => [
+                Rule::requiredIf($this->category instanceof Category),
+                Rule::unique('categories', 'slug'),
+            ]
+        ]);
+        $this->category->save();
+        $this->article->category_id = $this->category->id;
+        $this->closeCategoryForm();
+    }
+
+    public function delete()
+    {
+        Storage::disk('public')->delete($this->article->image);
+        $this->article->delete();
+        $this->redirect(route('articles.index'));
+        session()->flash('status', __('Article deleted.'));
     }
 
 }
